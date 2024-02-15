@@ -23,10 +23,13 @@ def while_loop(cond_fn, body_fn, operands):
   # operands: (Tuple of possibly nested dict/list/tuple of tensors)
   return _xla_while_loop(cond_fn, body_fn, operands)
 
+
 def _xla_while_loop(cond_fn, body_fn, operands):
+
   def op_fn(internal_x):
     zero = xb.Op.scalar(internal_x.builder(), 0, dtype=xb.Type.S32)
     w = xb.Op.mkwhile((zero, internal_x), cond_fn, body_fn)
     return w.get_tuple_element(1)
+
   op = xor.register('test_while', op_fn)
   return xu.as_list(op(operands[0]))
